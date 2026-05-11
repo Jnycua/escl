@@ -9,7 +9,7 @@
 				<u-col span="3">
 					<view class="menu-item" @click="handleClick1('课表查询')">
 						<u-icon name="order" size="30" color="#2979ff"></u-icon>
-						<text class="menu-text">课表查询</text>
+						<text class="menu-text">成绩查询</text>
 					</view>
 				</u-col>
 				<u-col span="3">
@@ -106,6 +106,7 @@
 	
 	const handleClick1 = (name) => {
 	    console.log(`点击了${name}`)
+		uni.navigateTo({ url: '/pages/academic/score' })
 	}
 	const handleClick2 = (name) => {
 	    console.log(`点击了${name}`)

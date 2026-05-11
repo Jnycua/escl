@@ -3,34 +3,34 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "uni-app"
+				"navigationBarTitleText": "E学塘"
 			}
 		},
 		{
 			"path": "pages/academic/academic",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "E学塘",
 				"enablePullDownRefresh": false
 			}
 		},
 		{
 			"path": "pages/life/life",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "E学塘",
 				"enablePullDownRefresh": false
 			}
 		},
 		{
 			"path": "pages/campus/campus",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "E学塘",
 				"enablePullDownRefresh": false
 			}
 		},
 		{
 			"path": "pages/me/me",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "E学塘",
 				"enablePullDownRefresh": false
 			}
 		},
@@ -44,8 +44,26 @@
 		{
 			"path": "pages/life/errand",
 			"style": {
-				"navigationBarTitleText": "",
+				"navigationBarTitleText": "跑腿服务",
 				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/academic/score",
+			"style": {
+				"navigationBarTitleText": "成绩查询"
+			}
+		},
+		{
+			"path": "pages/academic/exam",
+			"style": {
+				"navigationBarTitleText": "考试提醒"
+			}
+		},
+		{
+			"path": "pages/academic/login",
+			"style": {
+				"navigationBarTitleText": "E学塘"
 			}
 		}
 	],
@@ -97,7 +115,7 @@
 	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
+		"navigationBarTitleText": "E学塘",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
 	}
