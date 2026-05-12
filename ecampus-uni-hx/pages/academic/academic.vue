@@ -1,5 +1,5 @@
 <template>
-	<view class="schedule-container">
+	<view class="academic-container">
 		<!-- 自定义导航区域 - 在原生导航栏下方 -->
 		<view class="custom-nav-area">
 			<!-- 刷新按钮和第X周（整体下移） -->
@@ -15,9 +15,9 @@
 					<u-icon name="arrow-down" size="16" color="#666" class="arrow-icon"></u-icon>
 				</view>
 
-				<!-- 菜单按钮（新增，在最右边） -->
+				<!-- 菜单按钮 -->
 				<view class="menu-btn" @click="showMenu = true">
-					<u-icon name="order" size="24" color="#666"></u-icon>
+					<u-icon name="more-dot-fill" size="24" color="#666"></u-icon>
 				</view>
 			</view>
 		</view>
@@ -27,9 +27,11 @@
 			<view class="schedule-content">
 				<!-- 左侧时间轴 -->
 				<view class="time-axis">
-					<view class="time-axis-header"></view>
+					<view class="time-axis-header">
+						<text class="month-text">{{ currentMonth }}</text>
+					</view>
 					<view v-for="(timeSlot, index) in timeSlots" :key="index" class="time-slot">
-						<text class="time-text">{{ timeSlot }}</text>
+						<text class="time-text">{{ timeSlot.time }}</text>
 					</view>
 				</view>
 
@@ -77,7 +79,7 @@
 				<u-icon name="wifi-off" size="60" color="#909399"></u-icon>
 				<text class="error-text">网络连接失败</text>
 				<text class="error-desc">无法连接到服务器，请检查网络设置</text>
-				<button class="retry-btn" @click="loadScheduleData">重新连接</button>
+				<button class="retry-btn" @click="loadSchedule">重新连接</button>
 			</view>
 		</view>
 		
@@ -95,104 +97,106 @@
 </template>
 
 <script setup>
-	import {
-		ref,
-		computed,
-		onMounted
-	} from 'vue'
-	import {
-		onLoad,
-		onShow
-	} from '@dcloudio/uni-app'
+	import { ref, computed, onMounted } from 'vue'
+	import { onLoad, onShow } from '@dcloudio/uni-app'
+	
+	// 导入API函数
+	import { getCourseListRequest } from '@/api/api.js'
 
 	// 响应式数据
 	const currentWeek = ref(1)
 	const currentMonth = ref('05月')
 	const loading = ref(false)
-	const showMenu = ref(false) // 控制菜单显示
+	const showMenu = ref(false)
 	const scrollTop = ref(0)
-	const networkError = ref(false) // 网络错误状态
-	const showServerConfig = ref(true) // 显示服务器配置提示
+	const networkError = ref(false)
+	const showServerConfig = ref(false)
 
 	// 解析API数据后存储的课程列表
 	const courseList = ref([])
 
-	// 时间槽位定义（6个时间段）
+	// 时间槽位定义（按实际课表时间段）
 	const timeSlots = ref([
-		'08:20-10:00',
-		'10:20-12:00',
-		'14:00-15:40',
-		'16:00-17:40',
-		'18:40-20:20',
-		'20:30-22:10'
+		{ time: '08:20-10:00', period: '1-2节', index: 1 },
+		{ time: '10:20-12:00', period: '3-4节', index: 2 },
+		{ time: '14:00-15:40', period: '5-6节', index: 3 },
+		{ time: '16:00-17:40', period: '7-8节', index: 4 },
+		{ time: '18:40-20:20', period: '9-10节', index: 5 },
+		{ time: '20:30-22:10', period: '11-12节', index: 6 }
 	])
 
 	// 菜单选项
-	const menuActions = ref([{
-			name: '成绩查询',
-			color: '#2979ff',
-			fontSize: '16px',
-			icon: 'order',
-			url: '/pages/academic/score'  
-		},
-		{
-			name: '考试提醒',
-			color: '#2979ff',
-			fontSize: '16px',
-			icon: 'bell',
-			url: '/pages/academic/exam'  
-		}
+	const menuActions = ref([
+		{ name: '成绩查询', color: '#2979ff', fontSize: '16px', icon: 'list', action: 'scores' },
+		{ name: '考试安排', color: '#ff6b6b', fontSize: '16px', icon: 'calendar', action: 'exams' },
+		{ name: '课表设置', color: '#9c88ff', fontSize: '16px', icon: 'setting', action: 'settings' }
 	])
 
 	// 星期数据
-	const weekDays = ref([{
-			name: '周一',
-			date: '29日',
-			fullDate: '2023-05-29'
-		},
-		{
-			name: '周二',
-			date: '30日',
-			fullDate: '2023-05-30'
-		},
-		{
-			name: '周三',
-			date: '31日',
-			fullDate: '2023-05-31'
-		},
-		{
-			name: '周四',
-			date: '01日',
-			fullDate: '2023-06-01'
-		},
-		{
-			name: '周五',
-			date: '02日',
-			fullDate: '2023-06-02'
-		},
-		{
-			name: '周六',
-			date: '03日',
-			fullDate: '2023-06-03'
-		},
-		{
-			name: '周日',
-			date: '04日',
-			fullDate: '2023-06-04'
-		}
+	const weekDays = ref([
+		{ name: '周一', date: '29日', fullDate: '2023-05-29', index: 1 },
+		{ name: '周二', date: '30日', fullDate: '2023-05-30', index: 2 },
+		{ name: '周三', date: '31日', fullDate: '2023-05-31', index: 3 },
+		{ name: '周四', date: '01日', fullDate: '2023-06-01', index: 4 },
+		{ name: '周五', date: '02日', fullDate: '2023-06-02', index: 5 },
+		{ name: '周六', date: '03日', fullDate: '2023-06-03', index: 6 },
+		{ name: '周日', date: '04日', fullDate: '2023-06-04', index: 7 }
 	])
 
 	// 课程颜色映射
 	const courseColors = {
 		'思想政治实践课1': '#FF6B6B',
-		'网络工程': '#4ECDC4',
-		'马克思主义': '#45B7D1',
-		'大学体育1': '#96CEB4',
-		'创新创业大学生就业指导': '#FFEAA7',
-		'大学英语1': '#DDA0DD',
-		'高等数学': '#98D8AA',
-		'计算机科学导论': '#F8B195',
+		'创新设计与创业基础': '#4ECDC4',
+		'财务会计1': '#45B7D1',
+		'小程序开发从入门到放弃': '#96CEB4',
+		'大学英语A2': '#FFEAA7',
+		'大学体育2': '#DDA0DD',
+		'高等数学A2': '#98D8AA',
+		'中国近现代史纲要': '#F8B195',
 		'默认': '#2979FF'
+	}
+
+	// 解析 rawSection 字段
+	const parseRawSection = (rawSection) => {
+		if (!rawSection) return { day: 1, startPeriod: 1, endPeriod: 1 };
+		
+		// 提取星期
+		let day = 1; // 默认星期一
+		if (rawSection.includes('一')) day = 1;
+		else if (rawSection.includes('二')) day = 2;
+		else if (rawSection.includes('三')) day = 3;
+		else if (rawSection.includes('四')) day = 4;
+		else if (rawSection.includes('五')) day = 5;
+		else if (rawSection.includes('六')) day = 6;
+		else if (rawSection.includes('日') || rawSection.includes('七')) day = 7;
+		
+		// 提取节次范围
+		const timeMatch = rawSection.match(/\[(\d+)-(\d+)节\]/);
+		if (timeMatch) {
+			const startPeriod = parseInt(timeMatch[1]);
+			const endPeriod = parseInt(timeMatch[2]);
+			return { day, startPeriod, endPeriod };
+		} else {
+			// 如果没有找到范围，尝试找单独的节次
+			const singleTimeMatch = rawSection.match(/\[(\d+)节\]/);
+			if (singleTimeMatch) {
+				const period = parseInt(singleTimeMatch[1]);
+				return { day, startPeriod: period, endPeriod: period };
+			}
+		}
+		
+		return { day: 1, startPeriod: 1, endPeriod: 1 };
+	}
+
+	// 将时间段映射到课表索引
+	const mapPeriodToIndex = (period) => {
+		if (period >= 1 && period <= 2) return 1;   // 1-2节 -> 第1个时间段
+		if (period >= 3 && period <= 4) return 2;   // 3-4节 -> 第2个时间段
+		if (period >= 5 && period <= 6) return 3;   // 5-6节 -> 第3个时间段
+		if (period >= 7 && period <= 8) return 4;   // 7-8节 -> 第4个时间段
+		if (period >= 9 && period <= 10) return 5;  // 9-10节 -> 第5个时间段
+		if (period >= 11 && period <= 12) return 6; // 11-12节 -> 第6个时间段
+		return 1; // 默认第一个时间段
 	}
 
 	// 将API返回的课程数据转换为课表所需的格式
@@ -200,166 +204,45 @@
 		const transformedCourses = [];
 		
 		apiCourses.forEach((apiCourse, index) => {
-			// 解析时间信息
-			let dayIndex = 1; // 默认周一
-			let timeSlot = 1; // 默认第一个时间段
-			let duration = 1; // 默认持续1个时间段
+			// 解析 rawSection 字段
+			const parsedSection = parseRawSection(apiCourse.rawSection);
 			
-			// 解析 section 字段来确定时间和星期 - 添加类型检查
-			const section = apiCourse.section || '';
+			// 获取时间段索引
+			const startIndex = mapPeriodToIndex(parsedSection.startPeriod);
+			const endIndex = mapPeriodToIndex(parsedSection.endPeriod);
 			
-			// 确保 section 是字符串类型才进行 includes 操作
-			if (typeof section === 'string') {
-				// 提取星期信息
-				if (section.includes('一')) dayIndex = 1;
-				else if (section.includes('二')) dayIndex = 2;
-				else if (section.includes('三')) dayIndex = 3;
-				else if (section.includes('四')) dayIndex = 4;
-				else if (section.includes('五')) dayIndex = 5;
-				else if (section.includes('六')) dayIndex = 6;
-				else if (section.includes('日') || section.includes('七')) dayIndex = 7;
-				
-				// 提取节次信息
-				const timeMatch = section.match(/\[(\d+)-(\d+)节\]/);
-				if (timeMatch) {
-					const startPeriod = parseInt(timeMatch[1]);
-					
-					// 根据开始节次映射到时间段
-					if (startPeriod >= 1 && startPeriod <= 2) timeSlot = 1; // 08:20-10:00
-					else if (startPeriod >= 3 && startPeriod <= 4) timeSlot = 2; // 10:20-12:00
-					else if (startPeriod >= 7 && startPeriod <= 8) timeSlot = 3; // 14:00-15:40
-					else if (startPeriod >= 9 && startPeriod <= 10) timeSlot = 4; // 16:00-17:40
-					else if (startPeriod >= 11 && startPeriod <= 12) timeSlot = 5; // 18:40-20:20
-					else if (startPeriod >= 13 && startPeriod <= 14) timeSlot = 6; // 20:30-22:10
-				}
-			} else {
-				// 如果 section 不是字符串，尝试从其他字段获取时间信息
-				// 检查是否有 day 或 weekday 字段
-				if (apiCourse.day) {
-					dayIndex = parseInt(apiCourse.day);
-				} else if (apiCourse.weekday) {
-					dayIndex = parseInt(apiCourse.weekday);
-				}
-				
-				// 检查是否有 period 或 timeSlot 字段
-				if (apiCourse.period) {
-					const period = parseInt(apiCourse.period);
-					if (period >= 1 && period <= 2) timeSlot = 1; // 08:20-10:00
-					else if (period >= 3 && period <= 4) timeSlot = 2; // 10:20-12:00
-					else if (period >= 7 && period <= 8) timeSlot = 3; // 14:00-15:40
-					else if (period >= 9 && period <= 10) timeSlot = 4; // 16:00-17:40
-					else if (period >= 11 && period <= 12) timeSlot = 5; // 18:40-20:20
-					else if (period >= 13 && period <= 14) timeSlot = 6; // 20:30-22:10
-				} else if (apiCourse.timeSlot) {
-					timeSlot = parseInt(apiCourse.timeSlot);
-				}
-			}
+			// 计算持续时间
+			const duration = endIndex - startIndex + 1;
 			
 			// 创建转换后的课程对象
-			transformedCourses.push({
+			const course = {
 				id: index + 1,
 				name: apiCourse.name,
 				location: apiCourse.address || apiCourse.location || '待定',
-				day: dayIndex,
-				timeSlot: timeSlot,
-				duration: duration,
+				day: parsedSection.day, // 星期几 (1-7)
+				timeSlot: startIndex, // 开始时间段索引
+				duration: duration, // 持续时间段数
 				color: courseColors[apiCourse.name] || courseColors['默认'],
 				num: apiCourse.num || '',
 				credit: apiCourse.credit || 0,
 				totalHours: apiCourse.totalHours || 0,
 				teacher: apiCourse.teacher || '未知',
 				week: apiCourse.week || '全周',
-				category: apiCourse.category || '必修'
-			});
+				category: apiCourse.category || '必修',
+				sectionInfo: `${parsedSection.startPeriod}-${parsedSection.endPeriod}节`,
+				rawSection: apiCourse.rawSection
+			};
+			
+			transformedCourses.push(course);
 		});
 		
 		return transformedCourses;
 	}
 
-	// 导入API请求函数
-	const getCourseListRequest = async (data) => {
-		// 检查网络状态
-		const networkType = await new Promise(resolve => {
-			uni.getNetworkType({
-				success: (res) => resolve(res.networkType),
-				fail: () => resolve('unknown')
-			});
-		});
-		
-		if (networkType === 'none') {
-			throw new Error('网络不可用');
-		}
-		
-		// 构建请求
-		return new Promise((resolve, reject) => {
-			// 获取token
-			const token = uni.getStorageSync('token') || '';
-			
-			// 构建请求url - 改为真实的API地址
-			const baseUrl = "http://localhost:3000";
-			const url = `${baseUrl}/courses`;
-
-			// 发送请求
-			uni.request({
-				url: url,
-				method: 'GET',
-				timeout: 10000, // 10秒超时
-				header: {
-					'token': token
-				},
-				data: data || {},
-				success: (res) => {
-					console.log('API响应:', res);
-					
-					// 首先检查HTTP状态码
-					if (res.statusCode === 200) {
-						// 再检查业务状态码
-						if (res.data && typeof res.data === 'object') {
-							if (res.data.code === 0) {
-								// 请求成功，返回数据
-								resolve(res.data.data || []);
-							} else if (res.data.code === 403) {
-								// 登录失效
-								uni.showToast({
-									title: '登录已失效，请重新登录',
-									icon: 'none'
-								});
-								uni.removeStorageSync('token'); // 清除过期token
-								setTimeout(() => {
-									uni.redirectTo({
-										url: '/pages/login/index'
-									});
-								}, 1000);
-								reject(res.data);
-							} else {
-								// 其他业务错误
-								uni.showToast({
-									title: res.data.msg || '请求失败',
-									icon: 'none'
-								});
-								reject(res.data);
-							}
-						} else {
-							// 数据格式错误
-							reject(new Error('响应数据格式错误'));
-						}
-					} else {
-						// HTTP错误
-						reject(new Error(`HTTP ${res.statusCode}`));
-					}
-				},
-				fail: (err) => {
-					console.error('请求失败:', err);
-					reject(err);
-				}
-			});
-		});
-	};
-
 	// 页面加载
 	onLoad(async () => {
 		console.log('课表页面加载')
-		await loadScheduleData()
+		await loadSchedule()
 	})
 
 	// 页面显示
@@ -368,7 +251,7 @@
 	})
 
 	// 加载课表数据
-	const loadScheduleData = async () => {
+	const loadSchedule = async () => {
 		loading.value = true
 		networkError.value = false
 
@@ -392,9 +275,11 @@
 			if (Array.isArray(response)) {
 				// 转换API数据为课表格式
 				courseList.value = transformApiToSchedule(response);
+				console.log('转换后的课程数据:', courseList.value);
 			} else if (response && Array.isArray(response.data)) {
 				// 如果API返回格式为 { code: 200, msg: "请求成功", data: [...] }
 				courseList.value = transformApiToSchedule(response.data);
+				console.log('转换后的课程数据:', courseList.value);
 			} else {
 				uni.showToast({
 					title: '数据格式错误',
@@ -422,7 +307,7 @@
 		}
 	}
 
-	// 刷新课表
+	// 刷新课表数据
 	const refreshSchedule = async () => {
 		loading.value = true
 		networkError.value = false
@@ -447,9 +332,11 @@
 			if (Array.isArray(response)) {
 				// 转换API数据为课表格式
 				courseList.value = transformApiToSchedule(response);
+				console.log('刷新后的课程数据:', courseList.value);
 			} else if (response && Array.isArray(response.data)) {
 				// 如果API返回格式为 { code: 200, msg: "请求成功", data: [...] }
 				courseList.value = transformApiToSchedule(response.data);
+				console.log('刷新后的课程数据:', courseList.value);
 			} else {
 				uni.showToast({
 					title: '数据格式错误',
@@ -524,47 +411,50 @@
 	const viewCourseDetail = (course) => {
 		console.log('查看课程详情:', course)
 
-		const timeSlotText = timeSlots.value[course.timeSlot - 1]
-
 		uni.showModal({
 			title: course.name,
-			content: `课程编号：${course.num}\n学分：${course.credit}\n教师：${course.teacher}\n地点：${course.location}\n时间：${timeSlotText}\n星期：${course.day}\n周次：${course.week}\n类型：${course.category}`,
+			content: `课程编号：${course.num}\n学分：${course.credit}\n教师：${course.teacher}\n地点：${course.location}\n时间：${course.sectionInfo}\n星期：${['', '一', '二', '三', '四', '五', '六', '日'][course.day]}\n周次：${course.week}\n类型：${course.category}\n原始时间：${course.rawSection}`,
 			showCancel: true,
 			confirmText: '确定',
 			cancelText: '关闭'
 		})
 	}
 
-	// 【重点修改】处理菜单选择
-	const handleMenuSelect = (item) => {  // 这里改为接收 item 而不是 index
-		console.log('点击的菜单项:', item); // 打印出来看看是不是拿到了 url
-		
+	// 处理菜单选择
+	const handleMenuSelect = (item) => {
+		console.log('点击的菜单项:', item);
 		showMenu.value = false
 		
-		// 直接判断 item 是否存在且包含 url
-		if (item && item.url) {
-			uni.navigateTo({
-				url: item.url,
-				fail: (err) => {
-					console.error('跳转失败:', err);
-					uni.showToast({
-						title: '页面不存在，请检查 pages.json',
-						icon: 'none'
-					});
-				}
-			});
-		} else {
-			console.error('菜单项数据异常或缺少 url:', item);
-			uni.showToast({
-				title: '菜单配置错误',
-				icon: 'none'
-			});
+		switch(item.action) {
+			case 'scores':
+				// 成绩查询页面
+				uni.navigateTo({
+					url: '/pages/academic/score'
+				});
+				break;
+			case 'exams':
+				// 考试安排页面
+				uni.navigateTo({
+					url: '/pages/academic/exam'
+				});
+				break;
+			case 'settings':
+				// 课表设置页面
+				uni.navigateTo({
+					url: '/pages/academic/settings'
+				});
+				break;
+			default:
+				uni.showToast({
+					title: '功能暂未开放',
+					icon: 'none'
+				});
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.schedule-container {
+	.academic-container {
 		width: 100%;
 		height: 100vh;
 		background-color: #f8f9fa;
@@ -654,17 +544,28 @@
 
 	/* 时间轴 */
 	.time-axis {
-		width: 120rpx;
+		width: 120rpx; /* 改为原来的一半 */
 		flex-shrink: 0;
 		background-color: #ffffff;
 
 		.time-axis-header {
 			height: 80rpx;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-bottom: 1px solid #f0f0f0;
+		}
+
+		.month-text {
+			font-size: 26rpx;
+			color: #333;
+			font-weight: 500;
 		}
 
 		.time-slot {
-			height: 200rpx;
+			height: 200rpx; /* 恢复原来的高度 */
 			display: flex;
+			flex-direction: column;
 			align-items: center;
 			justify-content: center;
 			border-bottom: 1px solid #f0f0f0;
@@ -673,9 +574,9 @@
 
 		.time-text {
 			font-size: 24rpx;
-			color: #666;
-			text-align: center;
-			line-height: 1.4;
+			color: #333;
+			font-weight: 500;
+			text-align: center; 
 		}
 	}
 
@@ -732,7 +633,7 @@
 			width: 100%;
 
 			.grid-row {
-				height: 200rpx;
+				height: 200rpx; /* 恢复原来的高度 */
 				border-bottom: 1px solid #f0f0f0;
 
 				&:last-child {
