@@ -55,9 +55,11 @@
 	
 	const handleClick1 = (name) => {
 		console.log(`点击了${name}`)
+		uni.navigateTo({ url: '/pages/life/market' })
 	}
 	const handleClick2 = (name) => {
 		console.log(`点击了${name}`)
+		uni.navigateTo({ url: '/pages/life/lost' })
 	}
 	const handleClick3 = (name) => {
 		console.log(`点击了${name}`)
@@ -68,6 +70,7 @@
 	}
 	const handleClick4 = (name) => {
 		console.log(`点击了${name}`)
+		uni.navigateTo({ url: '/pages/life/phone' })
 	}
 </script>
 

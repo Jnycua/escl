@@ -65,6 +65,36 @@
 			"style": {
 				"navigationBarTitleText": "E学塘"
 			}
+		},
+		{
+			"path": "pages/academic/kbsql",
+			"style": {
+				"navigationBarTitleText": "课表的增删改查"
+			}
+		},
+		{
+			"path": "pages/campus/commentsbmt",
+			"style": {
+				"navigationBarTitleText": "帖子编辑"
+			}
+		},
+		{
+			"path": "pages/life/market",
+			"style": {
+				"navigationBarTitleText": "二手市场"
+			}
+		},
+		{
+			"path": "pages/life/phone",
+			"style": {
+				"navigationBarTitleText": "校园黄页"
+			}
+		},
+		{
+			"path": "pages/life/lost",
+			"style": {
+				"navigationBarTitleText": "失物招领"
+			}
 		}
 	],
 	"easycom": {
