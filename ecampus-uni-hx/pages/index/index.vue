@@ -1,9 +1,9 @@
 <template>
 	<view class="content">
-		<up-search placeholder="搜索内容" bg-color="#e3e3e3" v-model="keyword"></up-search>
+		<up-search placeholder="搜索校园资讯、社团活动" bg-color="#e3e3e3" v-model="keyword"></up-search>
 		<up-swiper v-if="list1.length" :list="list1" keyName="image" showTitle radius="8" :autoplay="true"
 			height="160"></up-swiper>
-		<up-notice-bar text="小程序内容正在开发中"></up-notice-bar>
+		<up-notice-bar text="校园平台持续优化中，欢迎师生体验使用"></up-notice-bar>
 		<view class="menu-area" >
 			<u-row gutter="16">
 				<u-col span="3">
@@ -46,7 +46,7 @@
 							{{ item.title }}
 						</view>
 						<view class="demo-price">
-							{{ item.times }}
+							浏览量：{{ item.times }}
 						</view>
 						<view class="demo-tag">
 							<view class="demo-tag-owner">
@@ -69,7 +69,7 @@
 							{{ item.title }}
 						</view>
 						<view class="demo-price">
-							{{ item.times }}
+							浏览量：{{ item.times }}
 						</view>
 						<view class="demo-tag">
 							<view class="demo-tag-owner">
@@ -128,116 +128,119 @@
 	// 响应式数据  
 	const keyword = ref('');
 
-	// 使用 reactive 创建响应式数组  
-	const list1 = reactive([{
-			image: '/static/img/uno.png',
-			title: '图片内容正在加载中1......',
+	// 校园轮播图数据
+	const list1 = reactive([
+		{
+			image: '/static/img/school1.png',
+			title: '春季校园运动会火热报名中',
 		},
 		{
-			image: '/static/img/uno.png',
-			title: '图片内容正在加载中2......',
+			image: '/static/img/school2.png',
+			title: '图书馆自习室开放时间调整通知',
 		},
 		{
-			image: '/static/img/uno.png',
-			title: '图片内容正在加载中3......',
+			image: '/static/img/school3.png',
+			title: '校级创新创业大赛正式启动',
 		},
 	]);
 
-	//waterfall
+	//瀑布流校园资讯数据
 	const flowList = ref([]);
-	const leftList = ref([{
-			img: '/static/img/uno.png',
-			title: '北国风光，千里冰封，万里雪飘',
-			times: '35次',
-			tag: ['李白旗舰店', '热门']
+	const leftList = ref([
+		{
+			img: '/static/img/school1.png',
+			title: '文学院开展经典诵读主题团日活动',
+			times: '1286',
+			tag: ['文学院', '校园活动']
 		},
 		{
-			img: '/static/img/uno.png',
-			title: '望长城内外，惟余莽莽',
-			times: '75次',
-			tag: ['杜甫旗舰店', '推荐'],
+			img: '/static/img/school2.png',
+			title: '计算机学院举办前端技术分享讲座',
+			times: '2563',
+			tag: ['计科院', '学习干货'],
+			isDot: '精选'
+		},
+		{
+			img: '/static/img/school3.png',
+			title: '校园志愿者服务队招新公告发布',
+			times: '968',
+			tag: ['校团委', '志愿活动']
+		},
+		{
+			img: '/static/img/school1.png',
+			title: '2026年春季普通话考试报名通知',
+			times: '3652',
+			tag: ['教务处', '考试通知']
+		},
+		{
+			img: '/static/img/school2.png',
+			title: '宿舍文明卫生评比活动圆满结束',
+			times: '1520',
+			tag: ['宿管中心', '校园日常']
+		},
+	]);
+	const rightList = ref([
+		{
+			img: '/static/img/school3.png',
+			title: '学生会文艺部校园歌手大赛筹备进行中',
+			times: '2135',
+			tag: ['校学生会', '文娱赛事']
+		},
+		{
+			img: '/static/img/school1.png',
+			title: '心理健康中心开设免费心理咨询服务',
+			times: '1862',
+			tag: ['心理中心', '暖心推送'],
 			isDot: '推荐'
 		},
 		{
-			img: '/static/img/uno.png',
-			title: '大河上下，顿失滔滔',
-			times: '385次',
-			tag: ['白居易旗舰店', '热门']
+			img: '/static/img/school2.png',
+			title: '校外兼职防诈骗安全知识宣讲',
+			times: '4521',
+			tag: ['保卫处', '安全科普']
 		},
 		{
-			img: '/static/img/uno.png',
-			title: '欲与天公试比高',
-			times: '784次',
-			tag: ['李易旗舰店', '最新']
+			img: '/static/img/school3.png',
+			title: '毕业季校园跳蚤市场活动预告',
+			times: '3256',
+			tag: ['生活服务', '热门活动']
 		},
 		{
-			img: '/static/img/uno.png',
-			title: '须晴日，看红装素裹，分外妖娆',
-			times: '7891次',
-			tag: ['甫白旗舰店', '热门']
-		},
-	]);
-	const rightList = ref([{
-			img: '/static/img/uno.png',
-			title: '明月几时有，把酒问青天',
-			times: '42次',
-			tag: ['苏轼旗舰店', '热卖']
+			img: '/static/img/school1.png',
+			title: '专升本备考经验分享交流会顺利举办',
+			times: '2890',
+			tag: ['升学备考', '经验分享']
 		},
 		{
-			img: '/static/img/uno.png',
-			title: '床前明月光，疑是地上霜',
-			times: '68次',
-			tag: ['李白诗社', '新品'],
+			img: '/static/img/school2.png',
+			title: '食堂新增特色菜品，满足师生多样口味',
+			times: '5632',
+			tag: ['校园食堂', '校园生活']
+		},
+		{
+			img: '/static/img/school3.png',
+			title: '羽毛球校园友谊赛报名通道开启',
+			times: '1689',
+			tag: ['体育部', '体育赛事']
+		},
+		{
+			img: '/static/img/school1.png',
+			title: '班级团建户外素质拓展活动推荐方案',
+			times: '1357',
+			tag: ['班级活动', '团建参考'],
 			isDot: '新品'
 		},
 		{
-			img: '/static/img/uno.png',
-			title: '春眠不觉晓，处处闻啼鸟',
-			times: '299次',
-			tag: ['孟浩然专卖', '热门']
+			img: '/static/img/school2.png',
+			title: '校园快递驿站取件时间调整说明',
+			times: '6892',
+			tag: ['后勤服务', '便民通知']
 		},
 		{
-			img: '/static/img/uno.png',
-			title: '红豆生南国，春来发几枝',
-			times: '520次',
-			tag: ['王维精品店', '浪漫']
-		},
-		{
-			img: '/static/img/uno.png',
-			title: '两个黄鹂鸣翠柳，一行白鹭上青天',
-			times: '168次',
-			tag: ['杜甫草堂', '热门']
-		},
-		{
-			img: '/static/img/uno.png',
-			title: '举头望明月，低头思故乡',
-			times: '365次',
-			tag: ['李白思乡', '经典']
-		},
-		{
-			img: '/static/img/uno.png',
-			title: '野火烧不尽，春风吹又生',
-			times: '666次',
-			tag: ['白居易诗铺', '热销']
-		},
-		{
-			img: '/static/img/uno.png',
-			title: '桃花潭水深千尺，不及汪伦送我情',
-			times: '999次',
-			tag: ['李白友情', '推荐'],
-			isDot: '推荐'
-		},
-		{
-			img: '/static/img/uno.png',
-			title: '海内存知己，天涯若比邻',
-			times: '1314次',
-			tag: ['王勃知己', '热门']
-		},
-		{
-			img: '/static/img/uno.png',
-			title: '问君能有几多愁，恰似一江春水向东流',
-			times: '888次',
-			tag: ['李煜愁思', '文艺']
+			img: '/static/img/school3.png',
+			title: '考研上岸学长学姐备考心得合集',
+			times: '7563',
+			tag: ['考研干货', '学霸经验']
 		}
 	]);
 	//滚动是否显示

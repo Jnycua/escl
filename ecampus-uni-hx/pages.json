@@ -95,6 +95,30 @@
 			"style": {
 				"navigationBarTitleText": "失物招领"
 			}
+		},
+		{
+			"path": "pages/detail/marketSend",
+			"style": {
+				"navigationBarTitleText": "二手发布"
+			}
+		},
+		{
+			"path": "pages/detail/marketDetail",
+			"style": {
+				"navigationBarTitleText": "二手详情"
+			}
+		},
+		{
+			"path": "pages/detail/lostSend",
+			"style": {
+				"navigationBarTitleText": "失物发布"
+			}
+		},
+		{
+			"path": "pages/detail/lostDetail",
+			"style": {
+				"navigationBarTitleText": "失物详情"
+			}
 		}
 	],
 	"easycom": {
